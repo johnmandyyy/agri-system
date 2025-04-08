@@ -64,8 +64,8 @@ class APIBuilder:
             serializer_class = SerializerHelpers().create_serializer(
                 self.model_name, self.app_name
             )
-
             pagination_class = None
+            authentication_classes = []
 
             # ------------------------------------------------------------------------------------------------------- #
             def get(self, request):
@@ -100,6 +100,7 @@ class APIBuilder:
             )
 
             pagination_class = None
+            authentication_classes = []
             
             # ------------------------------------------------------------------------------------------------------- #
             def get(self, request, *args, **kwargs):
@@ -172,6 +173,7 @@ class APIBuilder:
                 self.model_name, self.app_name
             )
             lookup_field = "pk"
+            authentication_classes = []
 
             # Defined methods and Properties.
             # Returns the APIBuilder instance since self belongs to APIBuilder not the subclass itself.
