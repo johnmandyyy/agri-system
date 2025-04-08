@@ -1,4 +1,4 @@
-from AesEverywhere import aes256
+#from AesEverywhere import aes256
 from django.conf import settings
 import json
 from datetime import datetime
@@ -17,7 +17,7 @@ class Token:
 
         try:
 
-            token = aes256.decrypt(token, settings.SECRET_KEY)
+            token = {}
             decrypted_dictionary = json.loads(token.decode("utf-8"))
 
             if app_constants.TOKEN_HAS_EXPIRY == True:
@@ -35,7 +35,7 @@ class Token:
         """ To check the user instance from token itself. """
         
         try:
-            token = aes256.decrypt(token, settings.SECRET_KEY)
+            token = {}
             decrypted_dictionary = json.loads(token.decode("utf-8"))
             username = decrypted_dictionary["user"]["username"]
             user_ = User.objects.get(username=username)
@@ -59,6 +59,6 @@ class Token:
         }
 
         secret_key = settings.SECRET_KEY
-        token = aes256.encrypt(json.dumps(payload), secret_key)
+        token = {}
         token = token.decode('utf-8')
         return token
