@@ -17,12 +17,7 @@ class TemplateView:
 
         TreeInstance = Tree()
         TreeInstance.decisionTree()
-        TreeInstance.predictAlgorithm({
-            "anemometer": 777,
-            "rainfall": 777,
-            "humidity": 777
-        })
-
+        
         assert isinstance(request, HttpRequest)
 
         if not request.user.is_authenticated:

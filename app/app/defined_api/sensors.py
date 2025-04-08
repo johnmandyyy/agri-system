@@ -2,6 +2,22 @@ from rest_framework.views import APIView
 from app.defined_api.decision_tree import Tree
 from rest_framework.response import Response
 
+class TrainData(APIView):
+    """ An API to train dataset(s). """
+
+    def __init__(self):
+        """ A constructor for datasets """
+        pass
+
+    def get(self, request):
+        """ Executes when POST is executed. """
+        tree_instance = Tree()
+        tree_instance.decisionTree()
+
+        return Response({
+            "message": "Training is done.",
+        }, 200)
+    
 
 class Sensor(APIView):
     """ An API View for sensor(s). """
@@ -20,7 +36,6 @@ class Sensor(APIView):
         message = 'No storm.'
 
         tree_instance = Tree()
-        
         prediction = tree_instance.predictAlgorithm({
             "anemometer": anemometer,
             "rainfall": rainfall,

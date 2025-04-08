@@ -9,7 +9,7 @@ from .api import *
 from app.constants import app_constants
 from rest_framework.schemas import get_schema_view
 from django.views.generic import TemplateView as TV
-from app.defined_api.sensors import Sensor
+from app.defined_api.sensors import Sensor, TrainData
 
 try:
     
@@ -53,6 +53,7 @@ api_patterns = [
     path("api/login/", Login.as_view(), name="authenticate_user"),
     path("api/account-section/", AccountSection.as_view(), name="account-section"),
     path("api/sensor/", Sensor.as_view(), name="sensor"),
+    path("api/train-model/", TrainData.as_view(), name="train-model"),
 ]
 
 # Exists in views.py all the tempaltes.

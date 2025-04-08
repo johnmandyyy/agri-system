@@ -66,7 +66,30 @@ class Tree:
         ]
 
         predictions = loaded_model.predict(formatted_data)
-        return predictions  
+        return predictions
+    
+    def mark_training(self, x_train, x_test, y_train, y_test):
+        """ A method to mark training remarks and validation in the datasets database. """
+
+        Dataset.objects.all().update(used_for = 'No Remark', predicted_value = None) # Set as default values first.
+
+        # X Values Related
+        for training in x_train: # Mark Primary Key(s) that were used in Training Process
+            Dataset.objects.all().filter(id = training[0]).update(
+                used_for = 'Training'
+            )
+
+        iterator = 0
+        for testing in x_test: # Mark Primary Key(s) that were used in Testing Process
+            # print(y_test[iterator], "Index: ", iterator)
+            Dataset.objects.all().filter(id = testing[0]).update(
+                used_for = 'Validation', predicted_value = y_test[iterator]
+            )
+
+            iterator = iterator + 1
+
+        # print(len(Dataset.objects.all().filter(used_for = 'Training')), len(Dataset.objects.all().filter(used_for = 'Validation')))
+        
 
     def decisionTree(self):
         """ A method to create decision tree. """
@@ -95,6 +118,8 @@ class Tree:
         X_test_original = [row[:] for row in X_test]
         X_train_original = [row[:] for row in X_train]
 
+        self.mark_training(X_train_original, X_test_original, y_train, y_test)
+
         # Modify the copied lists (removing the first element)
         for each_rows in X_test:
             each_rows.pop(0)
@@ -102,10 +127,9 @@ class Tree:
         for each_rows in X_train:
             each_rows.pop(0)
 
-        # Initialize Decision Tree classifier
-        dt_classifier = DecisionTreeClassifier(max_depth=5, random_state=42)
+        
 
-        # # Train the AdaBoost classifier
+        dt_classifier = DecisionTreeClassifier(max_depth=5, random_state=42)
         dt_classifier.fit(X_train, y_train)
 
         # Predictions
@@ -119,8 +143,6 @@ class Tree:
         precision = round(precision_score(y_test, y_pred_test), 2) * 100
         f1 = round(f1_score(y_test, y_pred_test), 2) * 100
         recall = round(recall_score(y_test, y_pred_test), 2) * 100
-
-        print(precision, f1, recall, test_accuracy)
 
         ModelInfo.objects.all().update(
             last_trained_state = datetime.now(),

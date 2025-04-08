@@ -6,6 +6,7 @@
     <div class="row">
 
         {% include 'app/constants/universal_modal.html' %}
+        {% include 'app/defined-modals/training.html' %}
         <h1 class="display-6 fw-bold">
             <i class="fa-solid fa-brain-circuit"></i> AI Model
         </h1>
@@ -117,13 +118,14 @@
             Here you can manage the dataset(s), such as add and delete.
         </p>
 
-        <div class="card">
+        <div class="card mb-2">
 
             <div class="card-body">
-
+                <button class="btn btn-primary" @click="setFilter()">
+                    Filter: [[ mode ]]
+                </button>
                 <div class="table-responsive">
                     <table class="table">
-
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
@@ -131,6 +133,8 @@
                                 <th scope="col">Rainfall Value</th>
                                 <th scope="col">Humidity Value</th>
                                 <th scope="col">Is Storm Present?</th>
+                                <th scope="col">Used For</th>
+                                <th scope="col">Remarks</th>
                             </tr>
                         </thead>
                         <tbody v-if="lists.DATASET">
@@ -143,6 +147,22 @@
                                 <td>[[ dataset.humidity ]]</td>
                                 <td>[[ dataset.is_storm_present ? 'Yes' :
                                     'No' ]]</td>
+                                <td>[[ dataset.used_for ]]</td>
+                                <td>
+                                    <span
+                                        v-if="dataset.used_for === 'Validation'">
+                                        <span
+                                            v-if="dataset.predicted_value === dataset.is_storm_present">
+                                            Correct
+                                        </span>
+                                        <span v-else>
+                                            Incorrect
+                                        </span>
+                                    </span>
+                                    <span v-else>
+                                        Not Used for Validation
+                                    </span>
+                                </td>
                             </tr>
                         </tbody>
 
@@ -151,20 +171,20 @@
 
             </div>
 
-        </div>
+            <div v-if="lists.DATASET"
+                class="d-flex justify-content-end mt-2 mb-2">
+                <button class="btn btn-primary me-2"
+                    :disabled="lists.DATASET.previous === null"
+                    @click="switchPage('PREVIOUS')">
+                    <i class="fa-solid fa-left"></i> Previous
+                </button>
+                <button class="btn btn-primary me-2"
+                    :disabled="lists.DATASET.next === null"
+                    @click="switchPage('NEXT')">
+                    Next <i class="fa-solid fa-right"></i>
+                </button>
 
-        <div v-if="lists.DATASET"
-            class="d-flex justify-content-end mt-2">
-            <button class="btn btn-primary me-2"
-                :disabled="lists.DATASET.previous === null"
-                @click="switchPage('PREVIOUS')">
-                <i class="fa-solid fa-left"></i> Previous
-            </button>
-            <button class="btn btn-primary me-2"
-                :disabled="lists.DATASET.next === null"
-                @click="switchPage('NEXT')">
-                Next <i class="fa-solid fa-right"></i>
-            </button>
+            </div>
 
         </div>
 
@@ -179,16 +199,27 @@ new Vue({
 
     data: {
 
-            lists: {},
-            url_models: {},
-            loading_state: {},
-            endpoints: {},
-            info: { MESSAGE: '', TITLE: '' },
-
-        state: {}
+        lists: {},
+        url_models: {},
+        loading_state: {},
+        endpoints: {},
+        info: { MESSAGE: '', TITLE: '' },
+        state: {
+            'FILTER_STATE': 0
+        }
     },
     computed: {
 
+        mode() {
+            if (this.state.FILTER_STATE === 0) {
+                return 'Showing All'
+            } else if (this.state.FILTER_STATE === 1) {
+                return 'Showing Training'
+            }
+            else if (this.state.FILTER_STATE === 2) {
+                return 'Showing Validation'
+            }
+        }
 
     },
     mounted() {
@@ -198,12 +229,37 @@ new Vue({
         Vue.set(this.loading_state, 'TRAINING', false);
     },
     methods: {
-            
-            async trainData () {
-                openModal('training_modal')
 
+            async setFilter() {
+
+                this.state.FILTER_STATE = this.state.FILTER_STATE + 1
+                let filters = {}
+                if (this.state.FILTER_STATE === 3) {
+                    this.state.FILTER_STATE = 0
+                }
+
+                if (this.state.FILTER_STATE === 0) {
+                    filters = {page: 1}
+                } else if (this.state.FILTER_STATE === 1) {
+                    filters = {page: 1, used_for:'Training'}
+                }
+                else if (this.state.FILTER_STATE === 2) {
+                    filters = {page: 1, used_for:'Validation'}
+                }      
+
+                await universalGet(this, 
+                    'LIST_GET', 
+                    'DATASET', 
+                    'DATASET', 
+                    'DATASET', 
+                    filters)
+            },
+
+            async trainData () {
+
+                openModal('training_modal')
                 this.loading_state['TRAINING'] = true
-                console.log(this.loading_state)
+
                 const url = '/api/train-model/'
                 const result = await axios.get(url)
 

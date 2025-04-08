@@ -43,7 +43,7 @@ class StackTrace(models.Model):
     description = models.TextField()
 
 class PredictionLog(models.Model):
-    date_of_prediction = models.DateTimeField(default = datetime.now())
+    date_of_prediction = models.DateTimeField(default = None, null = True)
     anemometer = models.IntegerField(default = 1, null = False)
     rainfall = models.IntegerField(default = 1, null = False)
     humidity = models.IntegerField(default = 1, null = False)
@@ -57,6 +57,8 @@ class Dataset(models.Model):
     rainfall = models.IntegerField(default = 1, null = False)
     humidity = models.IntegerField(default = 1, null = False)
     is_storm_present = models.BooleanField(default = False, null = False)
+    used_for = models.TextField(default = 'No Remark', null = False)
+    predicted_value = models.BooleanField(default = None, null = True)
 
 class ValidationLog(models.Model):
     anemometer = models.IntegerField(default = 1, null = False)
