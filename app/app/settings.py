@@ -15,14 +15,9 @@ INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
-    "django.contrib.messages",
-    "crispy_forms",
-    "crispy_bootstrap5",
-    "channels",
-    "daphne",
+    "django.contrib.messages"
     "django.contrib.staticfiles",
-    "rest_framework",
-    "drf_yasg",
+    "rest_framework"
 ]
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 MIDDLEWARE = [
