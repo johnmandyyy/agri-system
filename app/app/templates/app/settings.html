@@ -1,0 +1,118 @@
+{% extends "app/layout.html" %}
+{% load static %}
+{% block content %}
+
+<div id="{{ obj_name }}">
+    {% include 'app/constants/universal_modal.html' %}
+    <div class="row">
+
+        <div class="col-lg-12">
+            <h1 class="display-6 fw-bold">
+                <i class="fa-solid fa-gear"></i> Settings and
+                Configuration
+            </h1>
+
+            <p class="lead fw-bold text-muted">
+                Here you can customize and configure how the hardware behaves.
+            </p>
+
+            <label class="label mb-2">DC Motor Seconds Interval: * (Used to set
+                how long will the DC motor runs.)</label>
+            <input v-if="lists.STATE && lists.STATE[0]" type="text"
+                v-model="lists.STATE[0].dc_motor_seconds"
+                class="form-control mb-2">
+
+            <label class="label mb-2">DC Motor State: * (Used to set Enable /
+                Disable DC Motor)
+            </label>
+
+            <br>
+
+            <div class="form-check form-switch">
+                <input v-if="lists.STATE && lists.STATE[0]"
+                    class="form-check-input" type="checkbox" role="switch"
+                    v-model="lists.STATE[0].dc_motor"
+                    id="flexSwitchCheckDefault">
+                <label class="form-check-label"
+                    for="flexSwitchCheckDefault">Click to Set</label>
+            </div>
+
+            <br>
+
+            <label class="label mb-2">Prediction Interval: * (Interval in
+                minutes for prediction.)</label>
+            <input v-if="lists.STATE && lists.STATE[0]" type="text"
+                v-model="lists.STATE[0].prediction_minutes_interval"
+                class="form-control mb-2">
+
+            <button class="btn btn-primary w-100" @click="updateState()">Save
+                Changes</button>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+new Vue({
+    delimiters: ["[[", "]]"],
+    el: "#" + '{{ obj_name }}',
+    data: {
+        loading_state: {},
+        lists: {},
+        url_models: {},
+        endpoints: {},
+        info: {
+            'MESSAGE': '',
+            'TITLE': 'Sample Title'
+        },
+
+        props: {},
+        state: {
+            STATE_ID: 1
+        }
+    },
+    mounted() {
+        if (document.querySelector("#" + '{{ obj_name }}')) {
+            console.log("Mounted " + '{{ obj_name }}' + " page.")
+        }
+        initializeModels(this, ['STATE'])
+        universalGet(this,
+            'LIST_GET',
+            'STATE',
+            'STATE',
+            'STATE',
+            {}, ''
+        )
+    },
+    methods: {
+        setInfo(title, message) {
+            this.info.TITLE = title
+            this.info.MESSAGE = message
+        },
+        async updateState() {
+            console.log(this.lists.STATE[0].id)
+            this.props.STATE = this.lists.STATE[0]
+            this.state.STATE_ID = this.lists.STATE[0].id
+            const result = await universalPatch(this, 'GET_UPDATE_DESTROY', 
+            'STATE', 'STATE', 'STATE', 
+            'STATE_ID', 'STATE')
+            
+            if (result) {
+                this.setInfo('Notification', 'Successful update.')
+                openModal('message_modal')
+            }
+
+            await universalGet(this,
+            'LIST_GET',
+            'STATE',
+            'STATE',
+            'STATE',
+            null, ''
+        )
+        }
+    },
+});
+</script>
+{% endblock %}

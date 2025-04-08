@@ -1,0 +1,241 @@
+{% extends "app/layout.html" %}
+{% load static %}
+{% block content %}
+
+<div id="{{ obj_name }}">
+    <div class="row">
+
+        {% include 'app/constants/universal_modal.html' %}
+        <h1 class="display-6 fw-bold">
+            <i class="fa-solid fa-brain-circuit"></i> AI Model
+        </h1>
+
+        <p class="lead fw-bold text-muted">
+            View AI model performance and summary.
+        </p>
+        <div class="col-lg-12">
+            <p class="text-small fw-bold text-muted">Date Trained:</p>
+            <div class="row mb-2">
+
+                <div class="col-lg-12 mb-2">
+                    <button class="btn btn-primary mb-2"
+                        @click="trainData()">Train Model <i
+                            class="fa-solid fa-dumbbell"></i></button>
+
+                </div>
+
+                <div class="col-lg-3 mb-2">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="text-center">
+                                <h1 class="lead fw-bold">
+                                    Accuracy <i
+                                        class="fa-solid fa-bullseye"></i>
+                                </h1>
+
+                                <p class="lead fw-bold text-muted">
+                                    [[ lists.MODELINFO && lists.MODELINFO.length
+                                    > 0 && lists.MODELINFO[0].accuracy ?
+                                    lists.MODELINFO[0].accuracy : '0' ]] %
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 mb-2">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="text-center">
+                                <h1 class="lead fw-bold">
+                                    Precision <i class="fa-solid fa-check"></i>
+                                </h1>
+
+                                <p class="lead fw-bold text-muted">
+                                    [[ lists.MODELINFO && lists.MODELINFO.length
+                                    > 0 && lists.MODELINFO[0].precision ?
+                                    lists.MODELINFO[0].precision : '0' ]]
+                                    %
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 mb-2">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="text-center">
+                                <h1 class="lead fw-bold">
+                                    Recall <i class="fa-solid fa-plus"></i>
+                                </h1>
+
+                                <p class="lead fw-bold text-muted">
+                                    [[ lists.MODELINFO && lists.MODELINFO.length
+                                    > 0 && lists.MODELINFO[0].recall ?
+                                    lists.MODELINFO[0].recall : '0' ]]
+                                    %
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 mb-2">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="text-center">
+                                <h1 class="lead fw-bold">
+                                    F1 Score <i
+                                        class="fa-solid fa-hundred-points"></i>
+                                </h1>
+
+                                <p class="lead fw-bold text-muted">
+                                    [[ lists.MODELINFO && lists.MODELINFO.length
+                                    > 0 && lists.MODELINFO[0].f1_score ?
+                                    lists.MODELINFO[0].f1_score : '0' ]]
+                                    %
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <hr class="my-4" />
+
+        <h1 class="display-6 fw-bold">
+            <i class="fa-solid fa-database"></i> Dataset(s)
+        </h1>
+
+        <p class="lead fw-bold text-muted">
+            Here you can manage the dataset(s), such as add and delete.
+        </p>
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <div class="table-responsive">
+                    <table class="table">
+
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Anemometer Value</th>
+                                <th scope="col">Rainfall Value</th>
+                                <th scope="col">Humidity Value</th>
+                                <th scope="col">Is Storm Present?</th>
+                            </tr>
+                        </thead>
+                        <tbody v-if="lists.DATASET">
+
+                            <tr v-for="dataset in lists.DATASET.results">
+
+                                <td>[[ dataset.id ]]</td>
+                                <td>[[ dataset.anemometer ]]</td>
+                                <td>[[ dataset.rainfall ]]</td>
+                                <td>[[ dataset.humidity ]]</td>
+                                <td>[[ dataset.is_storm_present ? 'Yes' :
+                                    'No' ]]</td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div v-if="lists.DATASET"
+            class="d-flex justify-content-end mt-2">
+            <button class="btn btn-primary me-2"
+                :disabled="lists.DATASET.previous === null"
+                @click="switchPage('PREVIOUS')">
+                <i class="fa-solid fa-left"></i> Previous
+            </button>
+            <button class="btn btn-primary me-2"
+                :disabled="lists.DATASET.next === null"
+                @click="switchPage('NEXT')">
+                Next <i class="fa-solid fa-right"></i>
+            </button>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+new Vue({
+    delimiters: ["[[", "]]"],
+    el: "#" + '{{ obj_name }}',
+
+    data: {
+
+            lists: {},
+            url_models: {},
+            loading_state: {},
+            endpoints: {},
+            info: { MESSAGE: '', TITLE: '' },
+
+        state: {}
+    },
+    computed: {
+
+
+    },
+    mounted() {
+        initializeModels(this, ['DATASET', 'MODELINFO'])
+        universalGet(this, 'LIST_GET', 'DATASET', 'DATASET', 'DATASET', {page:1})
+        universalGet(this, 'LIST_CREATE', 'MODELINFO', 'MODELINFO', 'MODELINFO', {page:1})
+        Vue.set(this.loading_state, 'TRAINING', false);
+    },
+    methods: {
+            
+            async trainData () {
+                openModal('training_modal')
+
+                this.loading_state['TRAINING'] = true
+                console.log(this.loading_state)
+                const url = '/api/train-model/'
+                const result = await axios.get(url)
+
+                if (result) {
+                    console.log(result)
+                }
+
+                this.loading_state['TRAINING'] = false
+                universalGet(this, 'LIST_CREATE', 'MODELINFO', 'MODELINFO', 'MODELINFO')
+            },
+
+            // Object Calls.
+            async switchPage (option) {
+
+                var action = ''
+                
+                if (option === 'NEXT') {
+                    action = this.lists.DATASET.next
+                } else if (option === 'PREVIOUS') {
+                    action = ensurePageParam(this.lists.DATASET.previous )
+                }
+
+                await universalGet(this, 
+                    'LIST_GET', 
+                    'DATASET', 
+                    'DATASET', 
+                    'DATASET', 
+                    null,
+                    action)
+            },
+
+    },
+});
+</script>
+{% endblock %}
