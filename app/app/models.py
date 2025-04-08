@@ -77,6 +77,7 @@ class State(models.Model):
     dc_motor_seconds = models.IntegerField(default = 0, null = False)
     adaptive_mode = models.BooleanField(default = False, null = False)
     prediction_minutes_interval = models.IntegerField(default = 5, null = False)
+    last_datetime_prediction = models.DateTimeField(default = None, null =  True)
 
 class ModelInfo(models.Model):
 
