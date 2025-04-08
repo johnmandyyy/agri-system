@@ -34,6 +34,7 @@ class Sensor(APIView):
         humidity = request.data.get('humidity', 0)
 
         message = 'No storm.'
+        remark = 0
 
         tree_instance = Tree()
         prediction = tree_instance.predictAlgorithm({
@@ -44,8 +45,9 @@ class Sensor(APIView):
 
         if prediction[0] == True:
             message = 'A storm might occur.'
+            remark = 1
 
-        return Response({'message': message}, 200)
+        return Response({'message': message, 'remark': remark}, 200)
         
 
 
