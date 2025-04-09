@@ -26,12 +26,22 @@ class Sensor(APIView):
         """ A constructor for Sensor """
         pass
 
+    def universal_mapping(self, value, old_min=0, old_max=100, new_min=0, new_max=999):
+        """ Map a value from one range to another. """
+
+        if old_max - old_min == 0:
+            return 0
+
+        mapped_value = ((value - old_min) / (old_max - old_min)) * (new_max - new_min) + new_min
+        return int(mapped_value)  # return as integer
+
     def post(self, request):
         """ Executes when POST is executed. """
 
         anemometer = request.data.get('anemometer', 0)
         rainfall = request.data.get('rainfall', 0)
         humidity = request.data.get('humidity', 0)
+        humidity = self.universal_mapping(humidity, old_min=0, old_max=100, new_min=0, new_max=999)
 
         message = 'No storm.'
         remark = 0
