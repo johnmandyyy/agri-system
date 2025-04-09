@@ -14,9 +14,19 @@
                                 Anemometer <i
                                     class="fa-solid fa-wind-turbine"></i>
                             </p>
-                            <p class="text-body-secondary">
-                                33%
-                            </p>
+                            <span
+                                v-if="lists.SENSORVALUE && lists.SENSORVALUE[0]">
+                                <p class="text-body-secondary">
+                                    [[
+                                    universalMapping(lists.SENSORVALUE[0].anemometer)
+                                    ]] %
+                                </p>
+                            </span>
+                            <span v-else>
+                                <p class="text-body-secondary">
+                                    N/A
+                                </p>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -27,9 +37,19 @@
                                 Humidity <i
                                     class="fa-solid fa-droplet-percent"></i>
                             </p>
-                            <p class="text-body-secondary">
-                                67%
-                            </p>
+                            <span
+                                v-if="lists.SENSORVALUE && lists.SENSORVALUE[0]">
+                                <p class="text-body-secondary">
+                                    [[
+                                    universalMapping(lists.SENSORVALUE[0].humidity)
+                                    ]] %
+                                </p>
+                            </span>
+                            <span v-else>
+                                <p class="text-body-secondary">
+                                    N/A
+                                </p>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -39,9 +59,19 @@
                             <p class="lead fw-bold">
                                 Rainfall <i class="fa-solid fa-cloud-rain"></i>
                             </p>
-                            <p class="text-body-secondary">
-                                0%
-                            </p>
+                            <span
+                                v-if="lists.SENSORVALUE && lists.SENSORVALUE[0]">
+                                <p class="text-body-secondary">
+                                    [[
+                                    universalMapping(lists.SENSORVALUE[0].rainfall)
+                                    ]] %
+                                </p>
+                            </span>
+                            <span v-else>
+                                <p class="text-body-secondary">
+                                    N/A
+                                </p>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -75,13 +105,15 @@ new Vue({
         
     },
 
+
     mounted() {
         
         if (document.querySelector("#" + '{{ obj_name }}')) {
             console.log("Mounted " + '{{ obj_name }}' + " page.")
         }
 
-        initializeModels(this, ['USER'])
+        initializeModels(this, ['USER', 'SENSORVALUE'])
+
         universalGet(this,
             'LIST_GET',
             'USER',
@@ -90,9 +122,42 @@ new Vue({
             {}, ''
         )
 
+        universalGet(
+            this,
+            'LIST_GET',
+            'SENSORVALUE',
+            'SENSORVALUE',
+            'SENSORVALUE',
+            {},
+            ''
+        );
+
+        setInterval(() => { // Set interval every 10 seconds.
+            universalGet(
+                this,
+                'LIST_GET',
+                'SENSORVALUE',
+                'SENSORVALUE',
+                'SENSORVALUE',
+                {},
+                ''
+            );
+        }, 10000);
+
     },
 
-    methods: {},
+    methods: {
+
+        universalMapping(value, oldMin = 0, oldMax = 999, newMin = 0, newMax = 100) {
+            console.log(value)
+            if (oldMax - oldMin === 0) {
+                return 0; // Avoid division by zero
+            }
+            const mappedValue = ((value - oldMin) / (oldMax - oldMin)) * (newMax - newMin) + newMin;
+            return Math.round(mappedValue); // return as integer
+        }
+
+    },
 });
 
 </script>
