@@ -17,9 +17,7 @@
                             <span
                                 v-if="lists.SENSORVALUE && lists.SENSORVALUE[0]">
                                 <p class="text-body-secondary">
-                                    [[
-                                    universalMapping(lists.SENSORVALUE[0].anemometer)
-                                    ]] %
+                                    lists.SENSORVALUE[0].anemometer %
                                 </p>
                             </span>
                             <span v-else>
@@ -40,9 +38,7 @@
                             <span
                                 v-if="lists.SENSORVALUE && lists.SENSORVALUE[0]">
                                 <p class="text-body-secondary">
-                                    [[
-                                    universalMapping(lists.SENSORVALUE[0].humidity)
-                                    ]] %
+                                    lists.SENSORVALUE[0].humidity %
                                 </p>
                             </span>
                             <span v-else>
@@ -62,9 +58,7 @@
                             <span
                                 v-if="lists.SENSORVALUE && lists.SENSORVALUE[0]">
                                 <p class="text-body-secondary">
-                                    [[
-                                    universalMapping(lists.SENSORVALUE[0].rainfall)
-                                    ]] %
+                                    lists.SENSORVALUE[0].rainfall %
                                 </p>
                             </span>
                             <span v-else>
