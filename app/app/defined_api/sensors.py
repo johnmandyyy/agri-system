@@ -42,7 +42,7 @@ class Sensor(APIView):
         rainfall = request.data.get('rainfall', 0)
         humidity = request.data.get('humidity', 0)
         humidity = self.universal_mapping(humidity, old_min=0, old_max=100, new_min=0, new_max=999)
-
+        print(humidity, "Mapped Humidity")
         message = 'No storm.'
         remark = 0
 
